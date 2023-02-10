@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+
 import UserModel from "../models/User.js";
 
 export const register = async (req, res) => {
@@ -29,11 +30,14 @@ export const register = async (req, res) => {
 
     const { passwordHash, ...userData } = user._doc;
 
-    res.json({ ...userData, token });
+    res.json({
+      ...userData,
+      token,
+    });
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      message: "Не вдалося зареєструватись",
+      message: "Не удалось зарегистрироваться",
     });
   }
 };
@@ -41,18 +45,21 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const user = await UserModel.findOne({ email: req.body.email });
+
     if (!user) {
       return res.status(404).json({
-        message: "Користувач не знайдений",
+        message: "Пользователь не найден",
       });
     }
+
     const isValidPass = await bcrypt.compare(
       req.body.password,
       user._doc.passwordHash
     );
+
     if (!isValidPass) {
       return res.status(400).json({
-        message: "Не вірний логін або пароль",
+        message: "Неверный логин или пароль",
       });
     }
 
@@ -68,30 +75,35 @@ export const login = async (req, res) => {
 
     const { passwordHash, ...userData } = user._doc;
 
-    res.json({ ...userData, token });
+    res.json({
+      ...userData,
+      token,
+    });
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      message: "Не вдалося авторизуватись",
+      message: "Не удалось авторизоваться",
     });
   }
 };
 
 export const getMe = async (req, res) => {
   try {
-    const user = await UserModel.findById(req.userId); // Потрібно знайти користувача, витягнути з бази данних
+    const user = await UserModel.findById(req.userId);
+
     if (!user) {
       return res.status(404).json({
-        message: "Коритувач не знайдений",
+        message: "Пользователь не найден",
       });
     }
+
     const { passwordHash, ...userData } = user._doc;
 
     res.json(userData);
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      message: "Тест немає доступу",
+      message: "Нет доступа",
     });
   }
 };

@@ -6,16 +6,17 @@ export default (req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, "secret123");
-      req.userId = decoded._id; // Якщо змогли розшифрувати то в req.userId передаємо що розшифрували, а саме його _id
+
+      req.userId = decoded._id;
       next();
-    } catch (err) {
+    } catch (e) {
       return res.status(403).json({
-        message: "Немає доступу",
+        message: "Нет доступа",
       });
     }
   } else {
     return res.status(403).json({
-      message: "Немає доступу",
+      message: "Нет доступа",
     });
   }
 };
